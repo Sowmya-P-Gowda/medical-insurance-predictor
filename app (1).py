@@ -1,6 +1,7 @@
 import streamlit as st
 import numpy as np
 import pickle
+import pandas as pd
 
 # Load the trained model
 with open('random_forest_model.pkl', 'rb') as f:
@@ -11,35 +12,44 @@ st.title("💰 Medical Insurance Cost Predictor")
 st.markdown("### Enter User Details")
 
 # Input fields
-age = st.number_input("Age", min_value=18, max_value=100, value=30)
+age = st.slider("Age", 18, 100, 30)
+sex_input = st.radio("Sex", ["Male", "Female"])
+bmi = st.slider("BMI", 10.0, 60.0, 25.0)
+children = st.slider("Number of Children", 0, 10, 1)
+smoker_input = st.selectbox("Smoker", ["No", "Yes"])
+region_input = st.selectbox("Region", ["Southeast", "Southwest", "Northeast", "Northwest"])
 
-sex_input = st.selectbox("Sex", options=["Male", "Female"])
+# 🔁 Convert inputs to numeric model-ready values
 sex = 1 if sex_input == "Female" else 0
-
-bmi = st.number_input("BMI", min_value=10.0, max_value=60.0, value=25.0)
-
-children = st.number_input("Number of Children", min_value=0, max_value=10, value=1)
-
-smoker_input = st.selectbox("Smoker", options=["No", "Yes"])
 smoker = 1 if smoker_input == "Yes" else 0
-
-region_input = st.selectbox("Region", options=["Southeast", "Southwest", "Northeast", "Northwest"])
 region_map = {"Southeast": 0, "Southwest": 1, "Northeast": 2, "Northwest": 3}
 region = region_map[region_input]
 
-# Prepare features in correct order
-features = [age, sex, bmi, children, smoker, region]
-user_input = np.array([features])  # Must be 2D for sklearn
+# 🧠 Feature Engineering
+obese_smoker = int(bmi >= 30 and smoker == 1)
 
-# Debugging: Show input shape and model expectation
-# st.write("Input shape:", user_input.shape)
-# st.write("Model expects:", model.n_features_in_)
+# BMI Category
+bmi_bins = [0, 18.5, 24.9, 29.9, 100]
+bmi_labels = ['Underweight', 'Normal', 'Overweight', 'Obese']
+bmi_category = pd.cut([bmi], bins=bmi_bins, labels=bmi_labels, right=False)[0]
 
-# Predict and show result
+# You may encode this category for model input
+bmi_category_map = {'Underweight': 0, 'Normal': 1, 'Overweight': 2, 'Obese': 3}
+bmi_category_encoded = bmi_category_map[bmi_category]
+
+# ✅ Final features to the model (assume 8 features now)
+features = [age, sex, bmi, children, smoker, region, obese_smoker, bmi_category_encoded]
+user_input = np.array([features])
+
+# 🔮 Predict
 if st.button("Predict Insurance Expense"):
     try:
         prediction = model.predict(user_input)[0]
         st.success(f"💡 Predicted Medical Expense: ₹{prediction:,.2f}")
+        
+        st.markdown("##### 🧠 Engineered Features Used:")
+        st.write(f"- Obese Smoker: `{obese_smoker}`")
+        st.write(f"- BMI Category: `{bmi_category}`")
     except Exception as e:
-        st.error("Prediction failed. Error:")
+        st.error("Prediction failed.")
         st.error(str(e))
