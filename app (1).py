@@ -51,8 +51,8 @@ if st.button("Predict Insurance Expense"):
         st.write(f"- Obese Smoker: `{obese_smoker}`")
         st.write(f"- BMI Category: `{bmi_category}`")
         st.write(f"smoker = {smoker}")
-st.write(f"bmi = {bmi}")
-st.write(f"obese_smoker = {obese_smoker}")
+        st.write(f"bmi = {bmi}")
+        st.write(f"obese_smoker = {obese_smoker}")
     except Exception as e:
         st.error("Prediction failed.")
         st.error(str(e))
