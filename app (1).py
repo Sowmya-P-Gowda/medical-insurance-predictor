@@ -8,7 +8,6 @@ with open('random_forest_model.pkl', 'rb') as f:
 
 st.set_page_config(page_title="Medical Insurance Cost Predictor")
 st.title("💰 Medical Insurance Cost Predictor")
-
 st.markdown("### Enter User Details")
 
 # Input fields
@@ -28,12 +27,19 @@ region_input = st.selectbox("Region", options=["Southeast", "Southwest", "Northe
 region_map = {"Southeast": 0, "Southwest": 1, "Northeast": 2, "Northwest": 3}
 region = region_map[region_input]
 
-# Predict button
-if st.button("Predict Insurance Expense"):
-    # Prepare the input
-    features = [age, sex, bmi, children, smoker, region]
-    user_input = np.array([features])  # 2D array for model
+# Prepare features in correct order
+features = [age, sex, bmi, children, smoker, region]
+user_input = np.array([features])  # Must be 2D for sklearn
 
-    # Predict
-    prediction = model.predict(user_input)[0]
-    st.success(f"💡 Predicted Medical Expense: ₹{prediction:,.2f}")
+# Debugging: Show input shape and model expectation
+# st.write("Input shape:", user_input.shape)
+# st.write("Model expects:", model.n_features_in_)
+
+# Predict and show result
+if st.button("Predict Insurance Expense"):
+    try:
+        prediction = model.predict(user_input)[0]
+        st.success(f"💡 Predicted Medical Expense: ₹{prediction:,.2f}")
+    except Exception as e:
+        st.error("Prediction failed. Error:")
+        st.error(str(e))
