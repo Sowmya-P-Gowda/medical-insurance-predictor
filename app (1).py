@@ -21,7 +21,7 @@ region_input = st.selectbox("Region", ["Southeast", "Southwest", "Northeast", "N
 
 # 🔁 Convert inputs to numeric model-ready values
 sex = 1 if sex_input == "Female" else 0
-smoker = 1 if smoker_input == "Yes" else 0
+smoker = 0 if smoker_input == "Yes" else 0
 region_map = {"Southeast": 0, "Southwest": 1, "Northeast": 2, "Northwest": 3}
 region = region_map[region_input]
 
