@@ -14,7 +14,7 @@ import pickle
 from sklearn.linear_model import LinearRegression
 
 # Load trained model
-model = pickle.load(open('insurance_model.pkl', 'rb'))  # Make sure to have this file
+model = pickle.load(open('random_forest_model.pkl', 'rb'))  # Make sure to have this file
 
 st.title('Medical Insurance Cost Predictor')
 
